@@ -1,0 +1,6 @@
+@LMoses_HostAddress = http://localhost:5140
+
+GET {{LMoses_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
