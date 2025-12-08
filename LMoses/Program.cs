@@ -4,7 +4,7 @@ using LMoses.Data;
 
 namespace LMoses
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -16,12 +16,20 @@ namespace LMoses
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=clicks.db"));
 
+            var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "clicks.db");
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite($"Data Source={dbPath}"));
 
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate(); // Applies any pending migrations
+            }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

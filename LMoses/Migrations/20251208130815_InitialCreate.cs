@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,16 +12,16 @@ namespace LMoses.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ClickCounters",
+                name: "Clicks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Count = table.Column<int>(type: "INTEGER", nullable: false)
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClickCounters", x => x.Id);
+                    table.PrimaryKey("PK_Clicks", x => x.Id);
                 });
         }
 
@@ -28,7 +29,7 @@ namespace LMoses.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ClickCounters");
+                name: "Clicks");
         }
     }
 }

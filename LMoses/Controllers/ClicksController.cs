@@ -19,38 +19,32 @@ namespace LMoses.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Increment()
         {
-            var counter = await _db.ClickCounters.FirstOrDefaultAsync();
-
-            if (counter == null)
+            var click = new Click
             {
-                counter = new ClickCounter { Count = 1 };
-                _db.ClickCounters.Add(counter);
-            }
-            else
-            {
-                counter.Count++;
-            }
-
+                Timestamp = DateTime.UtcNow
+            };
+            _db.Clicks.Add(click);
             await _db.SaveChangesAsync();
-            return Ok(counter.Count);
+
+            // Return total clicks count
+            var count = await _db.Clicks.CountAsync();
+            return Ok(count);
         }
 
         [HttpGet]
-        public async Task<ActionResult<int>> GetCount()
+        public async Task<ActionResult<IEnumerable<Click>>> GetClicks()
         {
-            var counter = await _db.ClickCounters.FirstOrDefaultAsync();
-            return counter?.Count ?? 0;
+            var clicks = await _db.Clicks
+                .OrderByDescending(c => c.Timestamp)
+                .ToListAsync();
+            return Ok(clicks);
         }
 
         [HttpPost("reset")]
         public async Task<ActionResult> Reset()
         {
-            var counter = await _db.ClickCounters.FirstOrDefaultAsync();
-            if (counter != null)
-            {
-                counter.Count = 0;
-                await _db.SaveChangesAsync();
-            }
+            _db.Clicks.RemoveRange(_db.Clicks);
+            await _db.SaveChangesAsync();
             return Ok();
         }
 
