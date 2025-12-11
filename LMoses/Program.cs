@@ -13,6 +13,18 @@ namespace LMoses
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowVercelAndLocal", policy =>
+                {
+                    policy.WithOrigins(
+                            "http://localhost:5173", // local dev
+                            "https://lmoses-git-master-holycrusad3rs-projects.vercel.app" // deployed frontend
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -25,6 +37,7 @@ namespace LMoses
 
             var app = builder.Build();
 
+            app.UseCors("AllowVercelAndLocal");
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
