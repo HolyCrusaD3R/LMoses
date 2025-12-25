@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LMoses — Study Chat</title>
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body { 
+        margin: 0; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .topbar { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        height: 70px; 
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0,0,0,.1); 
+        display:flex; 
+        align-items:center; 
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+      }
+      .topbar-inner { 
+        width: min(1000px, 95vw); 
+        margin: 0 auto; 
+        display:flex; 
+        justify-content: space-between; 
+        align-items:center; 
+        padding: 0 20px;
+      }
+      .brand { 
+        font-size: 28px; 
+        font-weight: 800; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .pill { 
+        font-weight: 600; 
+        color: #667eea;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: rgba(102, 126, 234, 0.1);
+      }
+      .shell { 
+        width: min(1000px, 95vw); 
+        margin: 90px auto 30px; 
+        padding: 0 20px;
+      }
+      .card { 
+        border: none;
+        border-radius: 24px; 
+        overflow: hidden; 
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 20px 60px rgba(0,0,0,.15);
+        backdrop-filter: blur(10px);
+      }
+      .log { 
+        height: 65vh; 
+        min-height: 400px;
+        overflow-y: auto; 
+        overflow-x: hidden;
+        padding: 24px; 
+        background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
+        scroll-behavior: smooth;
+      }
+      .log::-webkit-scrollbar {
+        width: 8px;
+      }
+      .log::-webkit-scrollbar-track {
+        background: rgba(0,0,0,.05);
+        border-radius: 10px;
+      }
+      .log::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 10px;
+      }
+      .log::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.5);
+      }
+      .msg { 
+        margin: 16px 0; 
+        padding: 16px 20px; 
+        border-radius: 20px; 
+        max-width: 85%;
+        line-height: 1.6; 
+        word-wrap: break-word;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .msg.user { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin-left: auto;
+        margin-right: 0;
+        border-bottom-right-radius: 6px;
+      }
+      .msg.bot { 
+        background: white;
+        border: 1px solid rgba(0,0,0,.08);
+        margin-right: auto;
+        margin-left: 0;
+        border-bottom-left-radius: 6px;
+        color: #2d3748;
+      }
+      .msg.bot p {
+        margin: 0.5em 0;
+      }
+      .msg.bot p:first-child {
+        margin-top: 0;
+      }
+      .msg.bot p:last-child {
+        margin-bottom: 0;
+      }
+      .msg.bot strong {
+        font-weight: 700;
+        color: #1a202c;
+      }
+      .msg.bot em {
+        font-style: italic;
+      }
+      .msg.bot code {
+        background: rgba(102, 126, 234, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        color: #667eea;
+      }
+      .msg.bot pre {
+        background: rgba(0,0,0,.05);
+        padding: 12px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 0.5em 0;
+      }
+      .msg.bot pre code {
+        background: transparent;
+        padding: 0;
+        color: #2d3748;
+      }
+      .msg.bot ul, .msg.bot ol {
+        margin: 0.5em 0;
+        padding-left: 1.5em;
+      }
+      .msg.bot li {
+        margin: 0.25em 0;
+      }
+      .msg.bot blockquote {
+        border-left: 3px solid #667eea;
+        padding-left: 12px;
+        margin: 0.5em 0;
+        color: rgba(0,0,0,.7);
+      }
+      .katex {
+        font-size: 1.1em;
+      }
+      .katex-display {
+        margin: 0.5em 0;
+      }
+      .msg.typing {
+        position: relative;
+      }
+      .msg.typing::after {
+        content: '▊';
+        animation: blink 1s infinite;
+        color: #667eea;
+        margin-left: 4px;
+      }
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      form { 
+        display:flex; 
+        gap:12px; 
+        padding: 20px; 
+        border-top: 1px solid rgba(0,0,0,.08);
+        background: white;
+      }
+      input { 
+        flex: 1; 
+        padding: 14px 18px; 
+        border: 2px solid rgba(0,0,0,.2); 
+        border-radius: 16px; 
+        font-size: 15px;
+        transition: all 0.2s;
+        outline: none;
+        background: #ffffff !important;
+        color: #1a202c !important;
+        font-weight: 500;
+      }
+      input::placeholder {
+        color: rgba(0,0,0,.6) !important;
+        font-weight: 400;
+      }
+      input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        background: #ffffff !important;
+        color: #1a202c !important;
+      }
+      button { 
+        padding: 14px 28px; 
+        border-radius: 16px; 
+        border: 0; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; 
+        font-weight: 600; 
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      }
+      button:active:not(:disabled) {
+        transform: translateY(0);
+      }
+      button:disabled { 
+        opacity: .6; 
+        cursor: not-allowed;
+        transform: none;
+      }
+      .small { 
+        font-size: 13px; 
+        color: rgba(255,255,255,.9);
+        margin-top: 16px;
+        text-align: center;
+      }
+      .error { 
+        color: #ef4444; 
+        font-size: 13px; 
+        margin-top: 12px;
+        padding: 12px;
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 12px;
+        border-left: 3px solid #ef4444;
+      }
+      code { 
+        background: rgba(0,0,0,.08); 
+        padding: 3px 8px; 
+        border-radius: 6px;
+        font-size: 0.9em;
+      }
+      a { 
+        color: rgba(255,255,255,.9);
+        text-decoration: underline;
+      }
+      a:hover {
+        color: white;
+      }
+      .sources {
+        font-size: 12px;
+        color: rgba(0,0,0,.6);
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(0,0,0,.08);
+      }
+      .sources strong {
+        color: #667eea;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">LMoses</div>
+        <div class="pill">Chat With AI</div>
+      </div>
+    </div>
+
+    <div class="shell">
+      <div class="card">
+        <div class="log" id="chatLog">
+          <div class="msg bot">👋 Ask me anything about the slides! For example: "What is k mean clustering?"</div>
+        </div>
+        <form id="chatForm">
+          <input id="question" placeholder="Type your question…" autocomplete="off" />
+          <button id="sendBtn" type="submit">Send</button>
+        </form>
+      </div>
+
+      <div class="small">
+        API endpoint: <code>/api/chat</code> • Swagger: <a href="/swagger">/swagger</a>
+      </div>
+      <div class="error" id="errorBox"></div>
+    </div>
+
+    <script>
+      const chatLog = document.getElementById("chatLog");
+      const chatForm = document.getElementById("chatForm");
+      const questionEl = document.getElementById("question");
+      const sendBtn = document.getElementById("sendBtn");
+      const errorBox = document.getElementById("errorBox");
+
+      // Configure marked for markdown parsing
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({
+          breaks: true,
+          gfm: true,
+        });
+      }
+
+      function renderMarkdownAndMath(text) {
+        if (typeof marked === 'undefined') {
+          return text; // Fallback if marked.js not loaded
+        }
+        
+        // First, escape LaTeX delimiters to prevent markdown from interfering
+        const mathBlocks = [];
+        let processed = text;
+        
+        // Handle block math $$...$$
+        processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (match, content) => {
+          const id = `__MATH_BLOCK_${mathBlocks.length}__`;
+          mathBlocks.push({ id, type: 'block', content: content.trim() });
+          return id;
+        });
+        
+        // Handle inline math $...$
+        processed = processed.replace(/\$([^\$\n]+?)\$/g, (match, content) => {
+          const id = `__MATH_INLINE_${mathBlocks.length}__`;
+          mathBlocks.push({ id, type: 'inline', content: content.trim() });
+          return id;
+        });
+        
+        // Parse markdown
+        let html = marked.parse(processed);
+        
+        // Replace math placeholders with KaTeX rendering
+        mathBlocks.forEach(({ id, type, content }) => {
+          try {
+            let rendered;
+            if (type === 'block') {
+              rendered = katex.renderToString(content, { displayMode: true, throwOnError: false });
+            } else {
+              rendered = katex.renderToString(content, { displayMode: false, throwOnError: false });
+            }
+            html = html.replace(id, rendered);
+          } catch (e) {
+            // If KaTeX fails, show the original LaTeX
+            html = html.replace(id, type === 'block' ? `$$${content}$$` : `$${content}$`);
+          }
+        });
+        
+        return html;
+      }
+
+      function addMsg(text, who, sources = null) {
+        const div = document.createElement("div");
+        div.className = "msg " + who;
+        
+        if (who === 'bot') {
+          // Render markdown and math for bot messages
+          div.innerHTML = renderMarkdownAndMath(text);
+          // Render math after content is inserted
+          if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(div, {
+              delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+              ]
+            });
+          }
+        } else {
+          // User messages stay as plain text
+          div.textContent = text;
+        }
+        
+        chatLog.appendChild(div);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return div;
+      }
+
+      function typeText(element, text, speed = 30) {
+        const words = text.split(' ');
+        let currentIndex = 0;
+        let accumulatedText = '';
+        
+        element.classList.add('typing');
+        
+        function addNextWord() {
+          if (currentIndex < words.length) {
+            const word = words[currentIndex];
+            const space = currentIndex > 0 ? ' ' : '';
+            accumulatedText += space + word;
+            
+            // Re-render markdown and math as we type
+            element.innerHTML = renderMarkdownAndMath(accumulatedText);
+            if (typeof renderMathInElement !== 'undefined') {
+              renderMathInElement(element, {
+                delimiters: [
+                  {left: '$$', right: '$$', display: true},
+                  {left: '$', right: '$', display: false}
+                ]
+              });
+            }
+            
+            currentIndex++;
+            chatLog.scrollTop = chatLog.scrollHeight;
+            setTimeout(addNextWord, speed);
+          } else {
+            element.classList.remove('typing');
+          }
+        }
+        
+        addNextWord();
+      }
+
+      chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorBox.textContent = "";
+
+        const q = (questionEl.value || "").trim();
+        if (!q) return;
+
+        addMsg(q, "user");
+        questionEl.value = "";
+        sendBtn.disabled = true;
+        sendBtn.textContent = "Thinking…";
+
+        const botMsgDiv = addMsg("", "bot");
+        typeText(botMsgDiv, "Thinking...", 50);
+
+        try {
+          const resp = await fetch(`/api/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: q }),
+          });
+
+          const json = await resp.json().catch(() => ({}));
+          if (!resp.ok) throw new Error(json?.error || `Request failed (${resp.status})`);
+
+          botMsgDiv.textContent = "";
+          botMsgDiv.classList.add('typing');
+          
+          const answer = json.answer || "No answer returned.";
+          typeText(botMsgDiv, answer, 30);
+          
+          if (json.sources && json.sources.length > 0) {
+            setTimeout(() => {
+              const sourcesDiv = document.createElement("div");
+              sourcesDiv.className = "sources";
+              sourcesDiv.innerHTML = `<strong>Sources:</strong> ${json.sources.join(', ')}`;
+              botMsgDiv.appendChild(sourcesDiv);
+            }, answer.length * 30 + 200);
+          }
+        } catch (err) {
+          botMsgDiv.textContent = "";
+          botMsgDiv.classList.remove('typing');
+          errorBox.textContent = String(err?.message || err);
+        } finally {
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Send";
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
