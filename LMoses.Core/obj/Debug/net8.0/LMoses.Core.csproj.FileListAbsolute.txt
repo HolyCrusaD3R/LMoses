@@ -1,0 +1,11 @@
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/bin/Debug/net8.0/LMoses.Core.deps.json
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/bin/Debug/net8.0/LMoses.Core.dll
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/bin/Debug/net8.0/LMoses.Core.pdb
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.GeneratedMSBuildEditorConfig.editorconfig
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.AssemblyInfoInputs.cache
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.AssemblyInfo.cs
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.csproj.CoreCompileInputs.cache
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.dll
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/refint/LMoses.Core.dll
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/LMoses.Core.pdb
+/home/syph/Desktop/ZeshanCveniZma/PD/LMoses-master/LMoses.Core/obj/Debug/net8.0/ref/LMoses.Core.dll
